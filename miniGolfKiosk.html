@@ -1,0 +1,220 @@
+<!-- 
+Name: Don Bowers
+Date: 
+Purpose: Demonstrate the use of forms and functions to create a mini golf business interface.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Working with Forms</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <script src="js/bootstrap.js"></script>
+    <script src="js/jquery-3.6.4.min.js"></script>
+    <style>
+        [title] {
+            cursor: help;
+        }
+        html {
+            font-size: 13px;
+        }
+
+        fieldset.normal > legend {
+            width: auto;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            line-height: inherit;
+            color: inherit;
+            white-space: normal;
+        }
+
+        fieldset.normal {
+            border: 1px solid #dee2e6 !important;
+            border: #4e555b;
+            padding: 10px;
+        }
+
+        #totalArea input {
+            padding-left: 5px;
+            width: 20px;
+            font-size: 90%;
+        }
+        .main {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding-top: 10px;
+            padding-bottom: 20px;
+            border: 1px solid #dee2e6 !important;
+        }
+/*        @media (max-width: 991.98px) {
+            html {
+                font-size: 50px !important;
+            }
+        }*/
+
+    </style>
+
+    <script>
+        $(function () {
+            let $totalAfterTax = 0.00;
+
+            $('[name="discountGroup"]').each(function () {
+                $(this).on("change", updateTotals);
+            });
+
+            $('#adults').on("change", updateTotals);
+            $('#children').on("change", updateTotals);
+            $('#resetButton').on('click', resetForm)
+            $('#changeButton').on('click', calculateChange)
+            $('#adultTitle').prop("title", "(13 and older)")
+            $('#childTitle').prop("title", "(12 and under)")
+
+            // create function to do the math calculation
+            function updateTotals() {
+                // get the data
+
+
+                let $adults = $('#adults').val();
+                let $children = $('#children').val();
+                // ensure a qty is selected for aboves
+
+
+                if ($adults === "0" && $children === "0") {
+                    // they need to select a qty for children or adults
+                    alert("You must select a quantity for adults or children.");
+                } else {
+
+                    // calculate costs
+
+                    $("#numAdults").val($adults);
+                    let $adultTotal = parseInt($adults) * 4.00;
+
+                    $("#numChildren").val($children);
+                    let $childTotal = parseInt($children) * 2.00;
+
+                    $("#totalAdultsDiv").text("$" + $adultTotal.toFixed(2));
+                    $("#totalChildrenDiv").text("$" + $childTotal.toFixed(2));
+                    let $totalBeforeTax = ($adultTotal + $childTotal);
+
+
+                    // get discount radio choice
+                    let $deduct = 0;
+                    let $discountString = "None";
+                    if ($("#caa").is(':checked')) {
+                        $deduct = $totalBeforeTax * .10;
+                        $totalBeforeTax = $totalBeforeTax - $deduct;
+                        $discountString = "CAA saved $" + $deduct.toFixed(2);
+                    } else if ($("#mil").is(':checked')) {
+                        $deduct = $totalBeforeTax * .25;
+                        $totalBeforeTax = $totalBeforeTax - $deduct;
+                        $discountString = "Military saved $" + $deduct.toFixed(2);
+                    } else if ($("#fun").is(':checked')) {
+                        $deduct = $totalBeforeTax * .50;
+                        $totalBeforeTax = $totalBeforeTax - $deduct;
+                        $discountString = "Super Fun Club saved $" + $deduct.toFixed(2);
+                    }
+
+                    $("#discountString").html($discountString);
+                    $totalAfterTax = $totalBeforeTax * 1.1;
+                    $("#totalBeforeTaxDiv").html("$" + $totalBeforeTax.toFixed(2));
+                    $("#totalAfterTaxDiv").html("$" + $totalAfterTax.toFixed(2));
+                } // end if no adults or children selected
+
+
+            } // end update Totals function
+
+            //create function to reset the form
+            function calculateChange() {
+                let $amountGiven = parseFloat(prompt("Enter amount client gave you"));
+                let $changeDue = $amountGiven - $totalAfterTax;
+                $("#changeDue").html(" You owe the customer: $" + $changeDue.toFixed(2));
+                $("#changeOutput").css('display', 'block');
+            }
+
+            //create function to reset the form
+            function resetForm() {
+                window.location = "miniGolfKiosk.html";
+            }
+
+        });
+
+
+    </script>
+    <noscript>
+        "You don't have Javascript turned on! In order for this page to function properly you must turn on Javascript."
+    </noscript>
+</head>
+<body >
+<div class="container-fluid">
+    <h1>Jillian's Putt Putt Par-Tee</h1>
+    <h5>Point of Sale System</h5>
+    <div class="row">
+        <form class="col-md-12 ">
+
+                <fieldset class="form-group normal mr-5 w-100">
+                    <legend>Players</legend>
+                    <span id="adultTitle">Adults</span>
+                    <select id="adults">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select> $4 each<br><br>
+                    <span id="childTitle"> Children</span>
+                    <select id="children">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select> $2 each<br><br>
+                </fieldset>
+                <fieldset class="normal form-group">
+                    <legend>Discounts</legend>
+                    <input type="radio" id="caa" name="discountGroup" value="CAA" onchange="updateTotals()"/>
+                    CAA
+                    (10%)<br>
+                    <input type="radio" id="mil" name="discountGroup" value="Military"
+                           onchange="updateTotals()"/>
+                    Military
+                    (25%)<br>
+                    <input type="radio" id="fun" name="discountGroup" value="Fun Club Member"
+                           onchange="updateTotals()"/>
+                    FunClub Member (50%)<br>
+                </fieldset>
+
+        </form>
+
+
+        <div id="totalArea" class=" col-md-12">
+            <fieldset class="normal">
+                <legend>Totals</legend>
+                Number of Adults: <input type="text" id="numAdults" readonly="readonly" size="1"/>
+                <span id="totalAdultsDiv"></span>
+                <br>
+                Number of Children: <input type="text" id="numChildren" readonly="readonly"/>
+                <span id="totalChildrenDiv"></span>
+                <br>
+                <br>
+                Net Amount: <span id="totalBeforeTaxDiv"></span>
+                <br>
+                <br>
+                Gross Amount (including 10% tax): <span id="totalAfterTaxDiv"></span>
+                <br>
+                <button class="btn btn-primary" type="button" id="changeButton" onclick="calculateChange()">$CHANGE?
+                </button>
+                <div id="changeDue">You owe the customer:</div>
+                <hr>
+                Discounts Applied:<br>
+                <span id="discountString"></span>
+            </fieldset>
+        </div>
+        <button class="ml-3 btn btn-danger mt-3" id="resetButton" type="button">Reset Form</button>
+    </div>
+
+</div>
+
+
+</body>
+</html>
